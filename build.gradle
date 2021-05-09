@@ -1,0 +1,78 @@
+plugins {
+    id 'org.springframework.boot' version '2.3.10.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+    id "org.flywaydb.flyway" version "6.5.7"
+    id 'nu.studer.jooq' version "5.2.1"
+}
+
+group = 'com.adiSuper'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+    implementation 'org.springframework.boot:spring-boot-starter-jooq'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.flywaydb:flyway-core:6.5.7'
+    implementation 'com.okta.spring:okta-spring-boot-starter:1.4.0'
+
+    runtimeOnly 'org.postgresql:postgresql'
+    jooqGenerator 'org.postgresql:postgresql:42.2.20'
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jooq {
+    version = '3.14.7'
+    edition = nu.studer.gradle.jooq.JooqEdition.OSS
+    configurations {
+        main{
+            generationTool {
+                jdbc {
+                    driver = 'org.postgresql.Driver'
+                    url = 'jdbc:postgresql://localhost:5432/auth'
+                    user = 'postgres'
+                    password = ''
+                }
+                generator {
+                    database {
+                        name = 'org.jooq.meta.postgres.PostgresDatabase'
+                        includes = '.*'
+                        excludes = 'pg_catalog\\..*|information_schema\\..*|core\\.flyway_schema_history'
+
+                    }
+                    generate {
+                        pojos = true
+                        daos = true
+                        relations = true
+                        records = true
+                        generatedAnnotation = true
+                        jpaAnnotations = true
+                        validationAnnotations = true
+                        fluentSetters = true
+                        //springAnnotations = true
+                        //immutablePojos = true
+                    }
+                    target {
+                        packageName = 'com.adiSuper.generated'
+                    }
+                }
+            }
+        }
+    }
+}
