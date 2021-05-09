@@ -8,7 +8,7 @@ plugins {
 
 group = 'com.adiSuper'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
+sourceCompatibility = '13'
 
 repositories {
     mavenCentral()
@@ -36,18 +36,26 @@ dependencies {
 test {
     useJUnitPlatform()
 }
-
+flyway {
+    driver = 'org.postgresql.Driver'
+    url = System.getenv('SPRING_DATASOURCE_URL')
+    user = System.getenv('SPRING_DATASOURCE_USERNAME')
+    password = System.getenv('SPRING_DATASOURCE_USERNAME')
+    defaultSchema = 'core'
+    schemas = 'core'
+    locations = 'filesystem:src/main/resources/db/migration'
+}
 jooq {
     version = '3.14.7'
     edition = nu.studer.gradle.jooq.JooqEdition.OSS
     configurations {
-        main{
+        main {
             generationTool {
                 jdbc {
                     driver = 'org.postgresql.Driver'
-                    url = 'jdbc:postgresql://localhost:5432/auth'
-                    user = 'postgres'
-                    password = ''
+                    url = System.getenv('SPRING_DATASOURCE_URL')
+                    user = System.getenv('SPRING_DATASOURCE_USERNAME')
+                    password = System.getenv('SPRING_DATASOURCE_USERNAME')
                 }
                 generator {
                     database {
@@ -76,3 +84,4 @@ jooq {
         }
     }
 }
+
